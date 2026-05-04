@@ -1,0 +1,22 @@
+# Office temporales
+~$*
+*.tmp
+*.bak
+*.bkp
+
+# drawio temporales
+.$*.drawio.dtmp
+*.dtmp
+
+# Sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editores
+.vscode/
+.idea/
+*.swp
+
+# Logs locales
+*.log
