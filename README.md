@@ -30,6 +30,7 @@ Endurecer un servidor Ubuntu 22.04 LTS desde cero hasta cumplir CIS Benchmark Le
 |---|---|
 | [Writeup paso a paso](M4-Hardening-Linux/WRITEUP-Paso-a-Paso.md) | **Práctica completa de 3h 55min** con comandos directos y checkpoints |
 | [Curriculum detallado](M4-Hardening-Linux/Curriculum-Detallado.md) | Teoría, configs y referencias para 8 vídeos |
+| [Setup del laboratorio (SSH)](M4-Hardening-Linux/Setup-Lab-SSH.md) | Cómo conectar al lab cuando el host es Windows |
 
 **Capas cubiertas:**
 1. Identidad (PAM + sudo + SSH key-only)
