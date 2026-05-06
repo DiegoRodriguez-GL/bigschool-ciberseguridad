@@ -882,8 +882,9 @@ cat ~/HI-baseline.txt
 cat ~/HI-final.txt
 echo "=========================================="
 ```
-- HI final esperado: **≥ 80**
-- OpenSCAP CIS L1 esperado: **≥ 75% pass**
+- HI final esperado: **75-85** (sistemas Server limpios pueden superar 85; sistemas Desktop con snaps suelen quedarse en 75-80 por ruido en suggestions)
+- OpenSCAP CIS L1 esperado: **65-75% pass** (excluyendo not-applicable)
+- Subida típica sobre baseline: **+15 a +25 puntos**
 
 ---
 

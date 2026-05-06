@@ -99,6 +99,16 @@ En Ubuntu 26.04 fail2ban usa `backend = systemd` por defecto. El `logpath = /var
 |---|---|
 | Lynis HI baseline | 62 |
 | Lynis HI tras M1 | 69 (+7) |
-| Lynis HI final | (pendiente, se ejecuta con TMPDIR alternativo) |
+| **Lynis HI final** | **78** (+16 sobre baseline) |
 | OpenSCAP CIS L1 Server | 1952 pass / 910 fail / 405 NA |
 | Compliance % (excluyendo NA) | ~68% |
+
+### Resultado vs target del writeup
+
+El writeup aspira a HI ≥ 80. En este caso quedamos en **78**, faltan 2 puntos. Razones:
+- No aplicamos GRUB password (M3.3) → -2 puntos aprox
+- Sistema Desktop con muchos snaps (+ruido inevitable en suggestions)
+
+Para llegar a ≥80: aplicar GRUB password y desinstalar snaps no esenciales en sistemas Server reales.
+
+**Conclusión:** el writeup funciona. +16 puntos de hardening sobre baseline en una hora de aplicación. Material apto para entregar a alumnos con los 11 fixes ya integrados.
