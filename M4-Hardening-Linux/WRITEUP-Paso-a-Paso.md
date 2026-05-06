@@ -728,7 +728,7 @@ echo "=========================================="
 | M6 | 30 | 3:25 | auditd + rkhunter | Lynis logging +3/+6 |
 | M7 | 30 | 3:55 | OpenSCAP + Reporte | HI final ≥ 80 |
 
-**TOTAL: 3h 55min** (con margen de 25 min sobre el target de 3h 30min) ✅
+**TOTAL: 3h 55min**
 
 ---
 
@@ -752,7 +752,3 @@ echo "=========================================="
 - **Madaidan Hardening:** https://madaidans-insecurities.github.io/guides/linux-hardening.html
 - **OpenSCAP:** https://www.open-scap.org/
 - **Florian Roth auditd:** https://github.com/Neo23x0/auditd
-
----
-
-**FIN DEL WRITEUP**
