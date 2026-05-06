@@ -398,15 +398,21 @@ EOF
 
 ### 3.3 - GRUB password
 ```bash
+# Generar hash interactivamente (te pide password 2 veces)
 sudo grub-mkpasswd-pbkdf2
-# Copia el hash que sale (grub.pbkdf2.sha512.10000.XXXX...)
-sudo tee /etc/grub.d/40_custom <<'EOF'
+
+# Copia el hash que sale (formato: grub.pbkdf2.sha512.10000.XXXX...)
+
+# AÑADIR al final de /etc/grub.d/40_custom (NO pisarlo, ya tiene shebang)
+sudo tee -a /etc/grub.d/40_custom <<'EOF'
 set superusers="grubadmin"
 password_pbkdf2 grubadmin grub.pbkdf2.sha512.10000.PEGAR_HASH_AQUI
 EOF
+
+# Regenerar grub.cfg
 sudo update-grub
 ```
-**Por qué:** sin password GRUB, atacante con acceso físico → init=/bin/bash → root sin clave.
+**Por qué:** sin password GRUB, atacante con acceso físico puede arrancar con `init=/bin/bash` y obtener root sin clave. **OJO:** usar `tee -a` (append), no `tee` solo, porque `40_custom` por defecto trae un shebang `#!/bin/sh` y `exec tail -n +3 $0` que no debes pisar.
 
 ### 3.4 - Verificar
 ```bash
@@ -498,10 +504,20 @@ systemctl list-unit-files --state=enabled | grep -v static
 
 ### 5.2 - Deshabilitar lo innecesario
 ```bash
+# Servicios principales
 sudo systemctl disable --now avahi-daemon cups bluetooth ModemManager 2>/dev/null
+
+# IMPORTANTE: estos servicios usan socket activation. Hay que deshabilitar
+# tambien los .socket y .path para que no se relancen
+sudo systemctl disable --now avahi-daemon.socket cups.socket cups.path 2>/dev/null
+
+# Mask para impedir reactivacion accidental
 sudo systemctl mask avahi-daemon cups
+
+# Verificar
+systemctl list-unit-files --state=enabled | grep -E 'avahi|cups|bluetooth'
 ```
-**Por qué:** avahi/cups/bluetooth no aplican a server. Mask impide reactivación accidental.
+**Por qué:** avahi/cups/bluetooth no aplican a server. Mask impide reactivación accidental. En Ubuntu 24.04+ muchos servicios usan socket activation: si solo deshabilitas el `.service` pero el `.socket` sigue activo, al primer cliente que se conecte el servicio se relanza.
 
 ### 5.3 - Hardening systemd de un servicio
 
@@ -583,13 +599,24 @@ sudo systemctl restart ssh.service
 ### 5.4 - fstab: noexec/nosuid/nodev en /tmp
 ```bash
 sudo cp /etc/fstab /etc/fstab.bak
-sudo tee -a /etc/fstab <<'EOF'
-tmpfs /tmp tmpfs defaults,nodev,nosuid,noexec,size=2G 0 0
-EOF
-sudo mount -a
-mount | grep /tmp
+echo 'tmpfs /tmp tmpfs defaults,nodev,nosuid,noexec,size=2G 0 0' | sudo tee -a /etc/fstab
+sudo systemctl daemon-reload
+sudo mount -o remount /tmp
+mount | grep ' /tmp '
 ```
 **Por qué:** payloads de exploits suelen caer en /tmp y ejecutarse. `noexec` bloquea ejecutar. `nosuid` ignora SUID. `nodev` no permite dispositivos.
+
+**⚠️ Efecto colateral importante:** con `noexec` en /tmp **algunas herramientas dejan de funcionar**:
+- **Lynis** falla con "security measure" porque ejecuta scripts temporales en /tmp
+- **apt** puede fallar instalando paquetes que usan /tmp
+- Algunos instaladores (snap, dnf, etc.)
+
+**Workaround para Lynis:**
+```bash
+sudo TMPDIR=/var/lib/lynis lynis audit system
+```
+
+O ejecuta Lynis ANTES de aplicar este paso. Por eso en este writeup el último checkpoint Lynis (M7) usa `TMPDIR` o se hace antes de M5.4.
 
 ### 5.5 - Deshabilitar core dumps
 ```bash
@@ -723,10 +750,16 @@ sudo lynis audit system --quick --tests-from-group logging
 
 ### 7.1 - Lynis audit completo final
 ```bash
-sudo lynis audit system --report-file ~/lynis-final.dat
-grep "Hardening index" /var/log/lynis.log | tail -1 | tee ~/HI-final.txt
+# Si aplicaste /tmp con noexec en M5.4, Lynis necesita TMPDIR alternativo:
+sudo mkdir -p /var/lib/lynis-tmp
+sudo TMPDIR=/var/lib/lynis-tmp lynis audit system
+
+# Guardar HI final
+sudo grep "Hardening index" /var/log/lynis.log | tail -1 | tee ~/HI-final.txt
+sudo cp /var/log/lynis-report.dat ~/lynis-final.dat
+sudo chown $USER:$USER ~/lynis-final.dat
 ```
-**Por qué:** medición final del proceso completo.
+**Por qué:** medición final del proceso completo. El `TMPDIR` apunta fuera de `/tmp` para evitar el bloqueo por `noexec`.
 
 ### 7.2 - Comparar baseline vs final
 ```bash
@@ -738,14 +771,20 @@ diff ~/lynis-baseline.dat ~/lynis-final.dat | head -50
 
 ### 7.3 - OpenSCAP: perfil CIS
 ```bash
-sudo apt install -y libopenscap8 ssg-debderived
-ls /usr/share/xml/scap/ssg/content/
+# Ubuntu 24.04+: el paquete cambió de nombre
+sudo apt install -y openscap-scanner openscap-utils ssg-debderived
+oscap --version | head -1
 
-# Si no hay perfil ubuntu2204, usa el genérico:
-PROFILE_FILE=$(ls /usr/share/xml/scap/ssg/content/ssg-ubuntu*-ds.xml 2>/dev/null | head -1)
-oscap info $PROFILE_FILE | grep -A1 "Profile"
+# Listar contenido SCAP disponible
+ls /usr/share/xml/scap/ssg/content/ | grep ubuntu
+
+# Elegir el perfil más cercano a tu Ubuntu (en 26.04 usamos el de 24.04)
+PROFILE_FILE=/usr/share/xml/scap/ssg/content/ssg-ubuntu2404-ds.xml
+
+# Ver perfiles disponibles
+oscap info $PROFILE_FILE | grep -i 'profile_'
 ```
-**Por qué:** OpenSCAP es el estándar oficial CIS/STIG. Genera reporte profesional.
+**Por qué:** OpenSCAP es el estándar oficial CIS/STIG. Genera reporte profesional. **Nota Ubuntu 24.04+:** el paquete `libopenscap8` ya no existe. Ahora se llama `openscap-scanner` (binario `oscap`) y `openscap-utils`. Si tu Ubuntu es 26.04, usa el perfil de 24.04 (la diferencia es mínima en checks de hardening).
 
 ### 7.4 - Ejecutar perfil CIS L1 Server
 ```bash
@@ -755,19 +794,23 @@ sudo oscap xccdf eval \
   --report /tmp/oscap-report.html \
   $PROFILE_FILE
 
-# Ver el resultado:
-firefox /tmp/oscap-report.html &
+# Resumen rápido:
+sudo grep -oE '(pass|fail|notapplicable|notchecked)' /tmp/oscap-results.xml | sort | uniq -c
+
+# Ver el reporte HTML (abrir desde tu host con copia):
+ls -la /tmp/oscap-report.html
 ```
-**Por qué:** evaluación contra CIS Benchmark formal. El HTML es entregable.
+**Por qué:** evaluación contra CIS Benchmark formal. El HTML es entregable. **Nota:** ignora los warnings tipo `OpenSCAP Error: Unable to open file: '/usr/share/openscap/cpe/openscap-cpe-dict.xml'` - son inocuos, el eval funciona igual.
 
 ### 7.5 - Generar script de remediación (NO aplicar sin revisar)
 ```bash
 sudo oscap xccdf generate fix \
   --profile xccdf_org.ssgproject.content_profile_cis_level1_server \
   $PROFILE_FILE > /tmp/remediation.sh
+wc -l /tmp/remediation.sh
 less /tmp/remediation.sh
 ```
-**Por qué:** script automático de los checks que aún fallan. Útil pero PELIGROSO si se ejecuta a ciegas.
+**Por qué:** script automático de los checks que aún fallan. Útil pero **PELIGROSO** si se ejecuta a ciegas - puede romper servicios o cambiar configs que necesitas. Léelo antes y aplica solo lo que entiendes.
 
 ### 7.6 - Plantilla de informe
 ```bash
