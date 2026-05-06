@@ -290,11 +290,22 @@ sudo chmod +t /tmp /var/tmp           # solo si falta
 
 ### 2.4 - umask seguro
 ```bash
-sudo sed -i 's/^UMASK.*/UMASK 027/' /etc/login.defs
+# /etc/login.defs - en Ubuntu moderno puede no traer la línea UMASK.
+# Si existe la sustituimos, si no la añadimos.
+if grep -q '^UMASK' /etc/login.defs; then
+    sudo sed -i 's/^UMASK.*/UMASK 027/' /etc/login.defs
+else
+    echo 'UMASK 027' | sudo tee -a /etc/login.defs
+fi
+
+# Shells interactivas
 echo 'umask 027' | sudo tee -a /etc/profile
 echo 'umask 027' | sudo tee -a /etc/bash.bashrc
+
+# Verificar (en una sesión NUEVA)
+grep '^UMASK\|^umask' /etc/login.defs /etc/profile /etc/bash.bashrc
 ```
-**Por qué:** archivos nuevos no son legibles por "others". `027` = `rwxr-x---`.
+**Por qué:** archivos nuevos no son legibles por "others". `027` = `rwxr-x---`. En Ubuntu 26.04 el archivo `/etc/login.defs` por defecto no trae línea `UMASK`, hay que añadirla.
 
 ### 2.5 - ACL: caso práctico
 ```bash
@@ -492,10 +503,53 @@ sudo systemctl mask avahi-daemon cups
 ```
 **Por qué:** avahi/cups/bluetooth no aplican a server. Mask impide reactivación accidental.
 
-### 5.3 - Hardening de un servicio (ej: SSH)
+### 5.3 - Hardening systemd de un servicio
+
+**⚠️ AVISO CRÍTICO con SSH:** SSH es un caso especial. NO se le pueden aplicar todas las flags de hardening porque rompen su funcionamiento como punto de entrada al sistema:
+
+| Flag | Por qué NO en SSH |
+|---|---|
+| `ProtectHome=true` | Impide leer `~/.ssh/authorized_keys` → no puedes hacer login |
+| `NoNewPrivileges=true` | Impide que los usuarios SSH usen `sudo` |
+| `ProtectSystem=strict` | Deja `/etc /usr /boot` en read-only para los procesos hijo (incluyendo tu shell), no puedes modificar configs |
+
+Si aplicas estas flags a SSH y reinicias el servicio, **te quedas fuera del servidor**. Recuperación solo desde consola física.
+
+**Configuración correcta para SSH:**
+
 ```bash
 sudo mkdir -p /etc/systemd/system/ssh.service.d
 sudo tee /etc/systemd/system/ssh.service.d/hardening.conf <<'EOF'
+[Service]
+ProtectSystem=strict
+ProtectHome=read-only
+PrivateTmp=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+RestrictNamespaces=true
+LockPersonality=true
+RestrictRealtime=true
+SystemCallArchitectures=native
+# OJO: NO incluir NoNewPrivileges=true (rompe sudo)
+# OJO: ProtectHome debe ser read-only (no true)
+EOF
+
+sudo systemctl daemon-reload
+sudo systemctl restart ssh.service
+
+# Verificar que aún puedes conectar EN PARALELO antes de cerrar sesión
+# Score de hardening:
+sudo systemd-analyze security ssh
+```
+
+**Para servicios "normales" (nginx, postgresql, redis...) sí se puede usar el set completo:**
+
+```bash
+# Ejemplo con nginx (no afecta a tu sesión SSH)
+sudo mkdir -p /etc/systemd/system/nginx.service.d
+sudo tee /etc/systemd/system/nginx.service.d/hardening.conf <<'EOF'
 [Service]
 ProtectSystem=strict
 ProtectHome=true
@@ -507,15 +561,24 @@ ProtectKernelLogs=true
 ProtectControlGroups=true
 RestrictNamespaces=true
 LockPersonality=true
+MemoryDenyWriteExecute=true
 RestrictRealtime=true
 SystemCallArchitectures=native
 EOF
-
 sudo systemctl daemon-reload
-sudo systemctl restart ssh
-systemd-analyze security ssh
+sudo systemctl restart nginx
 ```
-**Por qué:** sandboxing del servicio. Si SSH es comprometido, no puede tocar el resto del sistema.
+
+**Por qué:** sandboxing del servicio. Si nginx es comprometido, no puede tocar el resto del sistema. Para SSH usamos un subset porque es el shell de los usuarios y no podemos restringirlo igual que un daemon de aplicación.
+
+**Recuperación si te quedas fuera por aplicar mal el hardening de SSH:**
+
+Desde consola física de la VM:
+```bash
+sudo rm /etc/systemd/system/ssh.service.d/hardening.conf
+sudo systemctl daemon-reload
+sudo systemctl restart ssh.service
+```
 
 ### 5.4 - fstab: noexec/nosuid/nodev en /tmp
 ```bash
