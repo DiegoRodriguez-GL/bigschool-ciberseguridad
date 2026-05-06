@@ -2,8 +2,8 @@
 
 **Sistema objetivo:** Ubuntu Server LTS limpia, 24.04 o superior (validado en 26.04 LTS)
 **Hipervisor:** VirtualBox / VMware (con snapshot inicial)
-**Duración total práctica:** ~3h 45min
-**Modelo:** Medir → Endurecer (7 módulos) → Medir → Reportar
+**Duración total práctica:** ~4h
+**Modelo:** Medir, Endurecer (7 módulos), Medir, Reportar
 **Métrica:** Lynis Hardening Index (HI) inicial vs final
 
 ---
@@ -21,7 +21,7 @@
 | **M5** | 35 min | systemd + fstab + AIDE + extras |
 | **M6** | 30 min | auditd + rkhunter + journald |
 | **M7** | 30 min | Auditoría final + Reporte |
-| **TOTAL** | **3h 50min** | |
+| **TOTAL** | **4h** | |
 
 > **Regla del módulo:** entre cada bloque se ejecuta `sudo lynis audit system --quick` para ver subir el HI.
 
@@ -143,7 +143,7 @@ with open('/etc/pam.d/common-auth', 'w') as f: f.write(c)
 # Verificar que se aplicó
 grep faillock /etc/pam.d/common-auth
 ```
-**Por qué:** 5 fallos → cuenta bloqueada 15 min. Mata brute-force local. En Debian/Ubuntu el módulo `pam_faillock.so` viene instalado pero **no está activado por defecto** en `/etc/pam.d/common-auth`. Solo escribir en `faillock.conf` no surte efecto, hay que añadir las 3 líneas de PAM.
+**Por qué:** 5 fallos -> cuenta bloqueada 15 min. Mata brute-force local. En Debian/Ubuntu el módulo `pam_faillock.so` viene instalado pero **no está activado por defecto** en `/etc/pam.d/common-auth`. Solo escribir en `faillock.conf` no surte efecto, hay que añadir las 3 líneas de PAM.
 
 ### 1.5 - sudoers seguro
 
@@ -525,7 +525,7 @@ systemctl list-unit-files --state=enabled | grep -E 'avahi|cups|bluetooth'
 
 | Flag | Por qué NO en SSH |
 |---|---|
-| `ProtectHome=true` | Impide leer `~/.ssh/authorized_keys` → no puedes hacer login |
+| `ProtectHome=true` | Impide leer `~/.ssh/authorized_keys` -> no puedes hacer login |
 | `NoNewPrivileges=true` | Impide que los usuarios SSH usen `sudo` |
 | `ProtectSystem=strict` | Deja `/etc /usr /boot` en read-only para los procesos hijo (incluyendo tu shell), no puedes modificar configs |
 
@@ -851,7 +851,9 @@ sudo oscap xccdf eval \
 # Resumen rápido:
 sudo grep -oE '(pass|fail|notapplicable|notchecked)' /tmp/oscap-results.xml | sort | uniq -c
 
-# Ver el reporte HTML (abrir desde tu host con copia):
+# Para ver el reporte HTML, copia el archivo al host:
+# Desde tu host:  scp -P 2222 admin@<vm-ip>:/tmp/oscap-report.html .
+# Y abrelo en el navegador.
 ls -la /tmp/oscap-report.html
 ```
 **Por qué:** evaluación contra CIS Benchmark formal. El HTML es entregable. **Nota:** ignora los warnings tipo `OpenSCAP Error: Unable to open file: '/usr/share/openscap/cpe/openscap-cpe-dict.xml'` - son inocuos, el eval funciona igual.
@@ -876,7 +878,7 @@ tee informe.md <<'EOF'
 
 ## 1. Resumen ejecutivo
 - Sistema: Ubuntu Server LTS (versión)
-- Periodo: <fecha-inicio> → <fecha-fin>
+- Periodo: <fecha-inicio> -> <fecha-fin>
 - Lynis HI baseline: <X>
 - Lynis HI final: <Y>
 - OpenSCAP CIS L1 compliance: <Z>%
@@ -914,7 +916,7 @@ sudo cp /etc/audit/rules.d/hardening.rules .
 
 ls -la ~/informe-hardening/
 ```
-**Por qué:** entregable profesional. Lo que distingue a un junior de un consultor senior.
+**Por qué:** entregable profesional. Sin informe el trabajo no se ve, aunque esté hecho.
 
 ### 7.7 - Configurar mantenimiento automático
 ```bash
@@ -930,7 +932,7 @@ echo '0 3 * * 0 root /usr/bin/lynis audit system --quick --cronjob > /var/log/ly
 **✓ CHECKPOINT FINAL**
 ```bash
 echo "=========================================="
-echo "  HARDENING INDEX BASELINE → FINAL"
+echo "  HARDENING INDEX BASELINE -> FINAL"
 echo "=========================================="
 cat ~/HI-baseline.txt
 cat ~/HI-final.txt
@@ -938,7 +940,7 @@ echo "=========================================="
 ```
 - HI final esperado: **80-85** (validado en Ubuntu 26.04 Desktop con snaps: HI 82)
 - OpenSCAP CIS L1 esperado: **65-75% pass** (excluyendo not-applicable)
-- Subida típica sobre baseline: **+18 a +25 puntos** (validado: 62 → 82, +20)
+- Subida típica sobre baseline: **+18 a +25 puntos** (validado: 62 -> 82, +20)
 
 ---
 
@@ -947,16 +949,16 @@ echo "=========================================="
 | Bloque | Min | Acumulado | Acción clave | Verificación |
 |---|---|---|---|---|
 | PRE | 15 | 0:15 | VM + snapshot + admin | `lynis --version` |
-| M0 | 15 | 0:30 | Lynis baseline | HI ≈ 55-65 |
+| M0 | 15 | 0:30 | Lynis baseline | HI ~ 55-65 |
 | M1 | 30 | 1:00 | PAM + SSH key-only | Lynis auth +5/+10 |
 | M2 | 25 | 1:25 | SUID + ACLs + caps | Lynis perms +3/+6 |
 | M3 | 30 | 1:55 | sysctl + módulos + GRUB | Lynis kernel +5/+8 |
 | M4 | 30 | 2:25 | UFW + Fail2ban | Lynis firewall +5/+8 |
-| M5 | 30 | 2:55 | systemd + fstab + AIDE | Lynis +5/+10 |
-| M6 | 30 | 3:25 | auditd + rkhunter | Lynis logging +3/+6 |
-| M7 | 30 | 3:55 | OpenSCAP + Reporte | HI final ≥ 80 |
+| M5 | 35 | 3:00 | systemd + fstab + AIDE + extras | Lynis +10/+15 |
+| M6 | 30 | 3:30 | auditd + rkhunter | Lynis logging +3/+6 |
+| M7 | 30 | 4:00 | OpenSCAP + Reporte | HI final >= 80 |
 
-**TOTAL: 3h 55min**
+**TOTAL: 4h**
 
 ---
 
