@@ -24,7 +24,7 @@ Aprender a investigar, explotar y reportar vulnerabilidades **CVE reales** sobre
 
 ### 🛡️ M4 - Hardening Linux
 
-Endurecer un servidor Ubuntu 22.04 LTS desde cero hasta cumplir CIS Benchmark Level 1, con métricas medibles (Lynis Hardening Index).
+Endurecer un servidor Ubuntu Server LTS (24.04+, validado en 26.04) desde cero hasta cumplir CIS Benchmark Level 1, con métricas medibles (Lynis Hardening Index).
 
 | Documento | Contenido |
 |---|---|
@@ -60,7 +60,7 @@ Cada módulo sigue un formato consistente:
 
 ## 📋 Requisitos comunes
 
-- VM con Ubuntu 22.04 LTS (limpia, snapshot inicial)
+- VM con Ubuntu Server LTS 24.04+ (validado en 26.04, limpia, snapshot inicial)
 - Docker + Docker Compose para los módulos de explotación
 - Conexión a Internet para `apt`, repos y scanners
 - Editor con renderizado Markdown (VS Code, Obsidian, Typora)

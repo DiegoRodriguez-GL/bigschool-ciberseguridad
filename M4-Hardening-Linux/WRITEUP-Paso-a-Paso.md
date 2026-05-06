@@ -1,6 +1,7 @@
 # M4 - HARDENING LINUX - WRITEUP PRÁCTICO
 
-**Sistema objetivo:** Ubuntu Server 22.04 LTS limpia (VM con snapshot)
+**Sistema objetivo:** Ubuntu Server LTS limpia, 24.04 o superior (validado en 26.04 LTS)
+**Hipervisor:** VirtualBox / VMware (con snapshot inicial)
 **Duración total práctica:** ~3h 45min
 **Modelo:** Medir → Endurecer (7 módulos) → Medir → Reportar
 **Métrica:** Lynis Hardening Index (HI) inicial vs final
@@ -648,7 +649,7 @@ tee informe.md <<'EOF'
 # Informe de Hardening - <hostname>
 
 ## 1. Resumen ejecutivo
-- Sistema: Ubuntu Server 22.04 LTS
+- Sistema: Ubuntu Server LTS (versión)
 - Periodo: <fecha-inicio> → <fecha-fin>
 - Lynis HI baseline: <X>
 - Lynis HI final: <Y>
