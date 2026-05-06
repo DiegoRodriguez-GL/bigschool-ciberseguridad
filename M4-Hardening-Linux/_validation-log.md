@@ -99,16 +99,28 @@ En Ubuntu 26.04 fail2ban usa `backend = systemd` por defecto. El `logpath = /var
 |---|---|
 | Lynis HI baseline | 62 |
 | Lynis HI tras M1 | 69 (+7) |
-| **Lynis HI final** | **78** (+16 sobre baseline) |
+| Lynis HI tras M5 (sin extras) | 78 (+16) |
+| **Lynis HI final tras M5.8 extras** | **82** (+20 sobre baseline) ✅ |
 | OpenSCAP CIS L1 Server | 1952 pass / 910 fail / 405 NA |
 | Compliance % (excluyendo NA) | ~68% |
 
 ### Resultado vs target del writeup
 
-El writeup aspira a HI ≥ 80. En este caso quedamos en **78**, faltan 2 puntos. Razones:
-- No aplicamos GRUB password (M3.3) → -2 puntos aprox
-- Sistema Desktop con muchos snaps (+ruido inevitable en suggestions)
+Target original: HI ≥ 80. **Conseguido: 82** ✅
 
-Para llegar a ≥80: aplicar GRUB password y desinstalar snaps no esenciales en sistemas Server reales.
+Para llegar a 85+: aplicar GRUB password + desinstalar snaps en sistemas Server limpios.
 
-**Conclusión:** el writeup funciona. +16 puntos de hardening sobre baseline en una hora de aplicación. Material apto para entregar a alumnos con los 11 fixes ya integrados.
+### Sección añadida tras la validación: M5.8 - Hardening adicional rápido
+
+Tras analizar las suggestions restantes de Lynis tras M5, se identificaron mejoras de bajo esfuerzo y alto impacto:
+
+- SSH extras (LogLevel VERBOSE, MaxSessions 2, TCPKeepAlive no, AllowAgentForwarding no)
+- Password aging (PASS_MAX_DAYS 90, PASS_MIN_DAYS 7, SHA_CRYPT_MIN_ROUNDS 500000)
+- Banner /etc/issue (login local, no solo SSH)
+- libpam-tmpdir (TMPDIR privado por sesión PAM)
+- Process accounting (`acct`)
+- APT helpers (apt-listchanges, needrestart, debsums, apt-show-versions)
+
+Subida medida: **+4 puntos** (de 78 a 82) en menos de 5 min de aplicación.
+
+**Conclusión:** el writeup funciona y supera el target con +20 puntos sobre baseline. Material apto para entregar a alumnos con los 11 fixes integrados y el bloque M5.8 añadido.

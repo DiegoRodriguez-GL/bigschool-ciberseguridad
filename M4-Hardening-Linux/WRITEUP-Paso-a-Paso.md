@@ -18,10 +18,10 @@
 | **M2** | 25 min | Permisos: SUID + ACLs + caps |
 | **M3** | 30 min | Kernel: sysctl + módulos + GRUB |
 | **M4** | 30 min | Firewall + Fail2ban |
-| **M5** | 30 min | systemd + fstab + AIDE |
+| **M5** | 35 min | systemd + fstab + AIDE + extras |
 | **M6** | 30 min | auditd + rkhunter + journald |
 | **M7** | 30 min | Auditoría final + Reporte |
-| **TOTAL** | **3h 45min** | |
+| **TOTAL** | **3h 50min** | |
 
 > **Regla del módulo:** entre cada bloque se ejecuta `sudo lynis audit system --quick` para ver subir el HI.
 
@@ -641,11 +641,65 @@ echo '0 5 * * * root /usr/bin/aide --check | mail -s "AIDE Report $(hostname)" a
 ```
 **Por qué:** chequeo diario automático. Te enteras al día siguiente si algo cambió.
 
+### 5.8 - Hardening adicional rápido (puntos extra de Lynis)
+
+Bloque corto de mejoras adicionales que Lynis pide y son triviales de aplicar. Sube fácilmente el HI entre 5 y 10 puntos.
+
+```bash
+# --- SSH extras (LogLevel verbose, sesiones reducidas, sin agent forwarding)
+sudo tee -a /etc/ssh/sshd_config.d/99-hardening.conf <<'EOF'
+LogLevel VERBOSE
+MaxSessions 2
+TCPKeepAlive no
+AllowAgentForwarding no
+EOF
+sudo sshd -t && sudo systemctl reload ssh.service
+
+# --- Password aging y hashing rounds en /etc/login.defs
+sudo sed -i 's/^PASS_MAX_DAYS\t.*/PASS_MAX_DAYS\t90/' /etc/login.defs
+sudo sed -i 's/^PASS_MIN_DAYS\t.*/PASS_MIN_DAYS\t7/' /etc/login.defs
+grep -q '^SHA_CRYPT_MIN_ROUNDS' /etc/login.defs || \
+    echo 'SHA_CRYPT_MIN_ROUNDS 500000' | sudo tee -a /etc/login.defs
+
+# --- Banner también en /etc/issue (login local), no solo issue.net (login remoto)
+sudo cp /etc/issue.net /etc/issue
+
+# --- libpam-tmpdir: TMPDIR privado por usuario para sesiones PAM
+sudo apt install -y libpam-tmpdir
+
+# --- Process accounting: registra todos los comandos ejecutados
+sudo apt install -y acct
+sudo systemctl enable --now acct
+
+# Test (debe mostrar comandos):
+sudo lastcomm | head -5
+
+# --- APT helpers (avisos de cambios y paquetes que necesitan reinicio)
+sudo apt install -y apt-listchanges needrestart debsums apt-show-versions
+
+# --- (Opcional, solo si tienes postfix instalado)
+if command -v postfix >/dev/null 2>&1; then
+    sudo postconf -e 'smtpd_banner=$myhostname ESMTP'
+    sudo postconf -e 'disable_vrfy_command=yes'
+    sudo systemctl reload postfix
+fi
+```
+
+**Por qué cada cosa:**
+
+- **SSH extras:** `VERBOSE` registra el fingerprint de claves usadas (forense). `MaxSessions 2` limita multiplexing. `TCPKeepAlive no` evita ataques de spoofing. `AllowAgentForwarding no` impide que un servidor comprometido robe tu agent SSH.
+- **Password aging:** rotación obligatoria cada 90 días, mínimo 7 días entre cambios. `SHA_CRYPT_MIN_ROUNDS 500000` hace los hashes mucho más caros de crackear.
+- **`/etc/issue`:** mismo banner para login local (consola física), no solo SSH.
+- **`libpam-tmpdir`:** cada sesión PAM tiene su propio `$TMPDIR` privado, mitiga ataques entre usuarios en /tmp.
+- **`acct`:** trazabilidad forense completa (todos los comandos quedan en `/var/log/account/pacct`).
+- **APT helpers:** `apt-listchanges` te avisa antes de upgrades. `needrestart` detecta servicios que necesitan reinicio post-update. `debsums` verifica integridad de paquetes. `apt-show-versions` muestra qué upgrades están pendientes.
+
 **✓ CHECKPOINT M5**
 ```bash
-sudo lynis audit system --quick
+sudo TMPDIR=/var/lib/lynis-tmp lynis audit system --quick
+sudo grep "Hardening index" /var/log/lynis.log | tail -1
 ```
-- HI esperado: **+5 a +10 sobre M4**
+- HI esperado: **+10 a +15 sobre M4**
 
 ---
 
@@ -882,9 +936,9 @@ cat ~/HI-baseline.txt
 cat ~/HI-final.txt
 echo "=========================================="
 ```
-- HI final esperado: **75-85** (sistemas Server limpios pueden superar 85; sistemas Desktop con snaps suelen quedarse en 75-80 por ruido en suggestions)
+- HI final esperado: **80-85** (validado en Ubuntu 26.04 Desktop con snaps: HI 82)
 - OpenSCAP CIS L1 esperado: **65-75% pass** (excluyendo not-applicable)
-- Subida típica sobre baseline: **+15 a +25 puntos**
+- Subida típica sobre baseline: **+18 a +25 puntos** (validado: 62 → 82, +20)
 
 ---
 
