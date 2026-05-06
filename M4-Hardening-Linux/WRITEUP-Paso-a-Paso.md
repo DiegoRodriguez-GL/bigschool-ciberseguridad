@@ -68,17 +68,18 @@ sudo lynis audit system
 
 ### 0.2 - Guardar el HI baseline
 ```bash
-grep "Hardening index" /var/log/lynis.log | tee ~/HI-baseline.txt
+sudo grep "Hardening index" /var/log/lynis.log | tee ~/HI-baseline.txt
 sudo cp /var/log/lynis-report.dat ~/lynis-baseline.dat
+sudo chown $USER:$USER ~/lynis-baseline.dat
 ```
-**Por qué:** lo compararemos al final del módulo.
+**Por qué:** lo compararemos al final del módulo. El log de Lynis solo lo lee root, por eso `sudo grep`.
 
 ### 0.3 - Ver warnings y suggestions
 ```bash
-sudo lynis show warnings
-sudo lynis show suggestions | head -50
+sudo grep '^warning\[\]=' ~/lynis-baseline.dat
+sudo grep '^suggestion\[\]=' ~/lynis-baseline.dat | head -20
 ```
-**Por qué:** lista de tareas que vamos a ir resolviendo módulo a módulo.
+**Por qué:** lista de tareas que vamos a ir resolviendo módulo a módulo. Leemos de `lynis-baseline.dat` (la copia) porque el `lynis-report.dat` original lo regenera el timer diario de Lynis y se puede pisar.
 
 **✓ CHECKPOINT M0**
 - HI esperado: **55-65**
@@ -118,26 +119,66 @@ EOF
 
 ### 1.4 - Lockout tras intentos fallidos (faillock)
 ```bash
+# Configuración de faillock
 sudo tee -a /etc/security/faillock.conf <<'EOF'
 deny = 5
 unlock_time = 900
 fail_interval = 900
 EOF
+
+# IMPORTANTE: en Debian/Ubuntu hay que activar el módulo manualmente en common-auth
+sudo cp /etc/pam.d/common-auth /etc/pam.d/common-auth.bak
+sudo python3 -c "
+import re
+with open('/etc/pam.d/common-auth') as f: c = f.read()
+c = re.sub(r'^(auth\s+\[success=2 default=ignore\]\s+pam_unix\.so.*)$',
+           r'auth\trequired\t\t\tpam_faillock.so preauth\n\1',
+           c, count=1, flags=re.MULTILINE)
+c = re.sub(r'^(auth\s+\[success=1 default=ignore\]\s+pam_sss\.so.*)$',
+           r'\1\nauth\t[default=die]\t\t\tpam_faillock.so authfail\nauth\tsufficient\t\t\tpam_faillock.so authsucc',
+           c, count=1, flags=re.MULTILINE)
+with open('/etc/pam.d/common-auth', 'w') as f: f.write(c)
+"
+
+# Verificar que se aplicó
+grep faillock /etc/pam.d/common-auth
 ```
-**Por qué:** 5 fallos → cuenta bloqueada 15 min. Mata brute-force local.
+**Por qué:** 5 fallos → cuenta bloqueada 15 min. Mata brute-force local. En Debian/Ubuntu el módulo `pam_faillock.so` viene instalado pero **no está activado por defecto** en `/etc/pam.d/common-auth`. Solo escribir en `faillock.conf` no surte efecto, hay que añadir las 3 líneas de PAM.
 
 ### 1.5 - sudoers seguro
+
+**Nota Ubuntu 26.04+:** trae `sudo-rs` (Rust) por defecto, que NO soporta todas las directivas clásicas (`logfile`, etc). Para enseñar/auditar hardening con las directivas estándar, cambiamos al `sudo` clásico que también viene instalado:
+
 ```bash
-sudo visudo
+# Comprobar qué sudo está activo
+sudo --version | head -1
+# Si dice "sudo-rs", cambiamos a sudo clásico:
+sudo update-alternatives --set sudo /usr/bin/sudo.ws
+sudo --version | head -1   # debería decir "Sudo version 1.9.X"
 ```
-Añadir/verificar:
-```
+
+Si tu sistema ya tiene sudo clásico (`Sudo version 1.9.X`), salta el paso anterior.
+
+```bash
+# Aplicar configuración hardening en /etc/sudoers.d/
+sudo tee /etc/sudoers.d/00-hardening <<'EOF'
 Defaults env_reset
 Defaults timestamp_timeout=5
 Defaults logfile="/var/log/sudo.log"
 Defaults !visiblepw
+Defaults use_pty
+EOF
+sudo chmod 440 /etc/sudoers.d/00-hardening
+
+# Validar sintaxis
+sudo visudo -c -f /etc/sudoers.d/00-hardening
+sudo visudo -c
+
+# Test del log
+sudo whoami
+sudo cat /var/log/sudo.log | tail -3
 ```
-**Por qué:** `env_reset` evita inyección por variables. Logfile audita cada sudo.
+**Por qué:** `env_reset` evita inyección por variables. `logfile` audita cada sudo en disco. `use_pty` fuerza que el comando se ejecute en una pseudo-TTY (impide trampas con stdin/stdout). `!visiblepw` evita que la contraseña se muestre si el TTY no la oculta.
 
 ### 1.6 - Generar par de claves SSH (en tu máquina, no la VM)
 ```bash
@@ -179,14 +220,39 @@ EOF
 ```
 **Por qué:** requisito legal en muchas auditorías (ANSSI, STIG). Disuasorio + cobertura legal.
 
-### 1.9 - Aplicar y test SSH
+### 1.9 - Override del socket SSH (Ubuntu 24.04+)
+
+En Ubuntu 24.04 y posteriores, SSH usa **socket activation** (`ssh.socket`). El puerto del listener viene del socket, no de `sshd_config`. Cambiar `Port 2222` en sshd_config no surte efecto si no actualizamos también el socket:
+
 ```bash
-sudo sshd -t                          # validar config sin reiniciar
-sudo systemctl restart ssh
-# DESDE OTRA TERMINAL - NO CIERRES LA SESIÓN ACTUAL:
-ssh -p 2222 admin@<vm-ip>
+# Verificar si tu sistema usa socket activation
+sudo systemctl is-active ssh.socket
+# Si dice "active", aplica el override:
+
+sudo mkdir -p /etc/systemd/system/ssh.socket.d/
+sudo tee /etc/systemd/system/ssh.socket.d/override.conf <<'EOF'
+[Socket]
+ListenStream=
+ListenStream=0.0.0.0:2222
+ListenStream=[::]:2222
+EOF
+
+sudo systemctl daemon-reload
 ```
-**Por qué:** si rompes SSH y cierras la única sesión, te quedas fuera. Mantén una abierta hasta confirmar.
+
+### 1.10 - Aplicar y test SSH
+```bash
+sudo sshd -t                          # validar sintaxis
+sudo systemctl restart ssh.socket     # solo si usas socket activation
+sudo systemctl restart ssh.service
+
+# Verificar que escucha en 2222
+sudo ss -tlnp | grep -E ':22 |:2222'
+
+# DESDE OTRA TERMINAL - NO CIERRES LA SESIÓN ACTUAL:
+ssh -p 2222 -i ~/.ssh/id_ed25519 admin@<vm-ip>
+```
+**Por qué:** si rompes SSH y cierras la única sesión, te quedas fuera. Mantén una abierta hasta confirmar que la nueva config funciona.
 
 **✓ CHECKPOINT M1**
 ```bash
