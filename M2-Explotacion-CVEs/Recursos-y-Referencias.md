@@ -1,7 +1,7 @@
 ================================================================================
-  MÓDULO M2 — EXPLOTACIÓN DE CVEs
+  MÓDULO M2 - EXPLOTACIÓN DE CVEs
   Recursos, fuentes oficiales y ejemplos para enseñar en directo
-  BigSchool — Escuela de Ciberseguridad
+  BigSchool - Escuela de Ciberseguridad
 ================================================================================
 
 
@@ -9,13 +9,13 @@
   ÍNDICE
 ────────────────────────────────────────────────────────────────────────────────
 
-  1. ¿QUÉ ES UN CVE?            — fuentes oficiales y bases de datos
-  2. CVSS                       — calculadora oficial y documentación
-  3. CNA vs VENDOR              — quién asigna los CVE IDs
-  4. CÓMO REPORTAR              — vías oficiales (MITRE, INCIBE, ENISA)
-  5. EJEMPLOS DE REPORTES       — INCIBE, MITRE/NVD, HackerOne, Project Zero
+  1. ¿QUÉ ES UN CVE?            - fuentes oficiales y bases de datos
+  2. CVSS                       - calculadora oficial y documentación
+  3. CNA vs VENDOR              - quién asigna los CVE IDs
+  4. CÓMO REPORTAR              - vías oficiales (MITRE, INCIBE, ENISA)
+  5. EJEMPLOS DE REPORTES       - INCIBE, MITRE/NVD, HackerOne, Project Zero
   6. CVEs HISTÓRICOS PARA ENSEÑAR
-  7. CISA KEV — VULNS ACTIVAS
+  7. CISA KEV - VULNS ACTIVAS
   8. VENDOR ADVISORIES
   9. ESTÁNDARES Y NORMATIVA
  10. EJERCICIO EN VIVO PROPUESTO
@@ -27,7 +27,7 @@
 ================================================================================
 
 DEFINICIÓN
-  Common Vulnerabilities and Exposures — identificador único y público de
+  Common Vulnerabilities and Exposures - identificador único y público de
   una vulnerabilidad concreta.
   Formato: CVE-AAAA-NNNNN  (año + número secuencial)
 
@@ -41,7 +41,7 @@ FUENTES OFICIALES
   • National Vulnerability Database (NIST)
     https://nvd.nist.gov
 
-  • CVE Records — buscador
+  • CVE Records - buscador
     https://www.cve.org/CVERecord/SearchResults
 
   • CVE List Downloads (JSON, CSV)
@@ -60,7 +60,7 @@ BASES DE DATOS COMPLEMENTARIAS
 
 
 ================================================================================
-  2. CVSS — Common Vulnerability Scoring System
+  2. CVSS - Common Vulnerability Scoring System
 ================================================================================
 
 DEFINICIÓN
@@ -79,7 +79,7 @@ CALCULADORAS OFICIALES
   • Calculadora CVSS v3.1 (NVD)
     https://nvd.nist.gov/vuln-metrics/cvss/v3-calculator
 
-  • Calculadora CVSS v4.0 (FIRST — versión nueva)
+  • Calculadora CVSS v4.0 (FIRST - versión nueva)
     https://www.first.org/cvss/calculator/4.0
 
   • Especificación oficial CVSS v3.1
@@ -109,14 +109,14 @@ RECURSOS DIDÁCTICOS
 
 
 ================================================================================
-  3. CNA vs VENDOR — quién es quién
+  3. CNA vs VENDOR - quién es quién
 ================================================================================
 
 VENDOR
   El fabricante del producto vulnerable (Microsoft, Apache, Cisco, etc.)
   Puede ser CNA o no serlo.
 
-CNA — CVE Numbering Authority
+CNA - CVE Numbering Authority
   Entidad autorizada por MITRE para asignar CVE IDs dentro de su scope.
   ~400 CNAs activas en el mundo.
 
@@ -147,11 +147,11 @@ LISTA OFICIAL DE CNAs
 
 
 ================================================================================
-  4. CÓMO REPORTAR UNA VULNERABILIDAD — VÍAS OFICIALES
+  4. CÓMO REPORTAR UNA VULNERABILIDAD - VÍAS OFICIALES
 ================================================================================
 
 ──────────────────────────────────────────────────
- 4.1 — MITRE / Programa CVE
+ 4.1 - MITRE / Programa CVE
 ──────────────────────────────────────────────────
   • Formulario de solicitud de CVE
     https://cveform.mitre.org
@@ -163,7 +163,7 @@ LISTA OFICIAL DE CNAs
     https://www.cve.org/ResourcesSupport/Resources
 
 ──────────────────────────────────────────────────
- 4.2 — INCIBE-CERT (España)
+ 4.2 - INCIBE-CERT (España)
 ──────────────────────────────────────────────────
   • Página principal de vulnerabilidades INCIBE-CERT
     https://www.incibe.es/incibe-cert/alerta-temprana/vulnerabilidades
@@ -182,7 +182,7 @@ LISTA OFICIAL DE CNAs
     https://www.incibe.es/incibe-cert/contacto
 
 ──────────────────────────────────────────────────
- 4.3 — CCN-CERT (sector público España)
+ 4.3 - CCN-CERT (sector público España)
 ──────────────────────────────────────────────────
   • Web oficial
     https://www.ccn-cert.cni.es
@@ -191,7 +191,7 @@ LISTA OFICIAL DE CNAs
     https://www.ccn-cert.cni.es/seguridad-al-dia/avisos-ccn-cert.html
 
 ──────────────────────────────────────────────────
- 4.4 — ENISA (Europa)
+ 4.4 - ENISA (Europa)
 ──────────────────────────────────────────────────
   • EU Vulnerability Database
     https://euvd.enisa.europa.eu
@@ -203,7 +203,7 @@ LISTA OFICIAL DE CNAs
     https://csirtsnetwork.eu
 
 ──────────────────────────────────────────────────
- 4.5 — CISA (USA — referencia internacional)
+ 4.5 - CISA (USA - referencia internacional)
 ──────────────────────────────────────────────────
   • CISA Vulnerability Disclosure Program
     https://www.cisa.gov/coordinated-vulnerability-disclosure-process
@@ -212,7 +212,7 @@ LISTA OFICIAL DE CNAs
     https://www.cisa.gov/sites/default/files/publications/CISA_CVD_Process.pdf
 
 ──────────────────────────────────────────────────
- 4.6 — security.txt (RFC 9116)
+ 4.6 - security.txt (RFC 9116)
 ──────────────────────────────────────────────────
   • Web oficial del estándar
     https://securitytxt.org
@@ -227,7 +227,7 @@ LISTA OFICIAL DE CNAs
     https://securitytxt.dev
 
 ──────────────────────────────────────────────────
- 4.7 — Plataformas de Bug Bounty
+ 4.7 - Plataformas de Bug Bounty
 ──────────────────────────────────────────────────
   • HackerOne          https://hackerone.com
   • Bugcrowd           https://www.bugcrowd.com
@@ -237,7 +237,7 @@ LISTA OFICIAL DE CNAs
   • Open Bug Bounty    https://www.openbugbounty.org
 
 ──────────────────────────────────────────────────
- 4.8 — disclose.io (safe harbor framework)
+ 4.8 - disclose.io (safe harbor framework)
 ──────────────────────────────────────────────────
   • Web oficial
     https://disclose.io
@@ -248,20 +248,20 @@ LISTA OFICIAL DE CNAs
 
 
 ================================================================================
-  5. EJEMPLOS DE REPORTES — PARA ENSEÑAR EN DIRECTO
+  5. EJEMPLOS DE REPORTES - PARA ENSEÑAR EN DIRECTO
 ================================================================================
 
 ──────────────────────────────────────────────────
- 5.1 — INCIBE-CERT (avisos en español, formato real)
+ 5.1 - INCIBE-CERT (avisos en español, formato real)
 ──────────────────────────────────────────────────
-  ★ React2Shell — análisis técnico completo
+  ★ React2Shell - análisis técnico completo
     CVE-2025-55182
     https://www.incibe.es/incibe-cert/publicaciones/bitacora-de-seguridad/explotacion-de-la-vulnerabilidad-react2shell-cve-2025-55182
 
-  • CVE-2025-1902 — SQL Injection en PHPGurukul Student Record System
+  • CVE-2025-1902 - SQL Injection en PHPGurukul Student Record System
     https://www.incibe.es/incibe-cert/alerta-temprana/vulnerabilidades/cve-2025-1902
 
-  • CVE-2025-2025 — Plugin GiveWP de WordPress
+  • CVE-2025-2025 - Plugin GiveWP de WordPress
     https://www.incibe.es/incibe-cert/alerta-temprana/vulnerabilidades/cve-2025-2025
 
   • CVE-2025-21616
@@ -270,75 +270,75 @@ LISTA OFICIAL DE CNAs
   • CVE-2025-20231
     https://www.incibe.es/incibe-cert/alerta-temprana/vulnerabilidades/cve-2025-20231
 
-  • Boletín Patch Tuesday Microsoft — Julio 2025
+  • Boletín Patch Tuesday Microsoft - Julio 2025
     https://www.incibe.es/incibe-cert/alerta-temprana/avisos/actualizaciones-de-seguridad-de-microsoft-de-julio-de-2025
 
-  • Boletín Patch Tuesday Microsoft — Noviembre 2025
+  • Boletín Patch Tuesday Microsoft - Noviembre 2025
     https://www.incibe.es/incibe-cert/alerta-temprana/avisos/actualizaciones-de-seguridad-de-microsoft-de-noviembre-de-2025
 
 ──────────────────────────────────────────────────
- 5.2 — MITRE / NVD (formato canónico mundial)
+ 5.2 - MITRE / NVD (formato canónico mundial)
 ──────────────────────────────────────────────────
   Para cada CVE puedes mostrar la doble vista:
   - CVE.org → metadatos oficiales del programa CVE
   - NVD     → análisis NIST + CVSS calculado + referencias
 
-  ★ CVE-2021-44228 — Log4Shell
+  ★ CVE-2021-44228 - Log4Shell
     https://www.cve.org/CVERecord?id=CVE-2021-44228
     https://nvd.nist.gov/vuln/detail/CVE-2021-44228
 
-  ★ CVE-2014-0160 — Heartbleed
+  ★ CVE-2014-0160 - Heartbleed
     https://www.cve.org/CVERecord?id=CVE-2014-0160
     https://nvd.nist.gov/vuln/detail/CVE-2014-0160
     Web dedicada: https://heartbleed.com
 
-  ★ CVE-2021-4034 — PwnKit (polkit, 12 años sin detectar)
+  ★ CVE-2021-4034 - PwnKit (polkit, 12 años sin detectar)
     https://www.cve.org/CVERecord?id=CVE-2021-4034
     https://nvd.nist.gov/vuln/detail/CVE-2021-4034
     Writeup Qualys: https://blog.qualys.com/vulnerabilities-threat-research/2022/01/25/pwnkit-local-privilege-escalation-vulnerability-discovered-in-polkit-pkexec-cve-2021-4034
 
-  ★ CVE-2022-0847 — Dirty Pipe
+  ★ CVE-2022-0847 - Dirty Pipe
     https://www.cve.org/CVERecord?id=CVE-2022-0847
     https://nvd.nist.gov/vuln/detail/CVE-2022-0847
     Writeup original (Max Kellermann): https://dirtypipe.cm4all.com
 
-  ★ CVE-2021-3156 — Sudo Baron Samedit
+  ★ CVE-2021-3156 - Sudo Baron Samedit
     https://www.cve.org/CVERecord?id=CVE-2021-3156
     https://nvd.nist.gov/vuln/detail/CVE-2021-3156
     Writeup Qualys: https://blog.qualys.com/vulnerabilities-research/2021/01/26/cve-2021-3156-heap-based-buffer-overflow-in-sudo-baron-samedit
 
 ──────────────────────────────────────────────────
- 5.3 — HackerOne Hacktivity (reportes reales públicos)
+ 5.3 - HackerOne Hacktivity (reportes reales públicos)
 ──────────────────────────────────────────────────
   ORO PURO para enseñar redacción de reportes.
 
   • Hacktivity (feed público)
     https://hackerone.com/hacktivity
 
-  • Top reports archive (GitHub — recopilación histórica)
+  • Top reports archive (GitHub - recopilación histórica)
     https://github.com/reddelexc/hackerone-reports
 
   • Top all-time
     https://github.com/reddelexc/hackerone-reports/blob/master/tops_by_program/TOPHACKERONE.md
 
   REPORTES LEGENDARIOS:
-  • #340431 — Shopify GraphQL race condition
+  • #340431 - Shopify GraphQL race condition
     https://hackerone.com/reports/340431
 
-  • #2095245 — GitLab
+  • #2095245 - GitLab
     https://hackerone.com/reports/2095245
 
-  • #156536 — Twitter (IDOR)
+  • #156536 - Twitter (IDOR)
     https://hackerone.com/reports/156536
 
-  • #105663 — Stored XSS Slack (clásico)
+  • #105663 - Stored XSS Slack (clásico)
     https://hackerone.com/reports/105663
 
-  • #225537 — Uber subdomain takeover
+  • #225537 - Uber subdomain takeover
     https://hackerone.com/reports/225537
 
 ──────────────────────────────────────────────────
- 5.4 — Google Project Zero
+ 5.4 - Google Project Zero
 ──────────────────────────────────────────────────
   Disclosure de élite con embargo de 90 días estricto.
 
@@ -355,7 +355,7 @@ LISTA OFICIAL DE CNAs
     https://googleprojectzero.github.io/0days-in-the-wild
 
 ──────────────────────────────────────────────────
- 5.5 — GitHub Security Advisories
+ 5.5 - GitHub Security Advisories
 ──────────────────────────────────────────────────
   • Advisory Database completa (búsqueda por CVE / CWE / paquete)
     https://github.com/advisories
@@ -369,14 +369,14 @@ LISTA OFICIAL DE CNAs
 
 
 ================================================================================
-  6. CVEs HISTÓRICOS — CASOS DIDÁCTICOS PARA CLASE
+  6. CVEs HISTÓRICOS - CASOS DIDÁCTICOS PARA CLASE
 ================================================================================
 
 ──────────────────────────────────────────────────
  BUENOS EJEMPLOS DE DISCLOSURE RESPONSABLE
 ──────────────────────────────────────────────────
 
-  ★ CVE-2021-44228 — Log4Shell
+  ★ CVE-2021-44228 - Log4Shell
     Investigador: Chen Zhaojun (Alibaba Cloud Security Team)
     Vendor:       Apache Software Foundation
     Lección:      Cómo reportar bien algo crítico. Apache movió el parche
@@ -384,45 +384,45 @@ LISTA OFICIAL DE CNAs
     CVSS:         10.0 Critical
     Tipo:         RCE en Java logging library
 
-  ★ CVE-2014-0160 — Heartbleed
+  ★ CVE-2014-0160 - Heartbleed
     Investigador: Neel Mehta (Google) + Codenomicon
     Vendor:       OpenSSL
     Lección:      Coordinated disclosure multi-stakeholder + branding bug
                   con web propia (heartbleed.com) para concienciar.
     Tipo:         Memory disclosure en TLS heartbeat
 
-  ★ CVE-2021-4034 — PwnKit
+  ★ CVE-2021-4034 - PwnKit
     Investigador: Qualys Research Team
     Vendor:       polkit project
     Lección:      Vuln de 12 años. Disclosure técnico modélico con writeup
                   detallado tras parche.
     Tipo:         Local privilege escalation
 
-  ★ CVE-2022-0847 — Dirty Pipe
+  ★ CVE-2022-0847 - Dirty Pipe
     Investigador: Max Kellermann (CM4all)
     Vendor:       Linux kernel
     Lección:      Writeup público brutal post-parche. Plantilla perfecta
                   de cómo redactar un advisory técnico.
     Tipo:         LPE en kernel Linux
 
-  ★ CVE-2021-3156 — Baron Samedit (sudo)
+  ★ CVE-2021-3156 - Baron Samedit (sudo)
     Investigador: Qualys Research Team
     Vendor:       sudo project
     Lección:      Heap overflow en software ubicuo. Disclosure cuidadoso.
     Tipo:         Local privilege escalation
 
 ──────────────────────────────────────────────────
- MALOS EJEMPLOS — DISCLOSURE QUE SALIÓ MAL
+ MALOS EJEMPLOS - DISCLOSURE QUE SALIÓ MAL
 ──────────────────────────────────────────────────
 
-  ✗ CVE-2021-34527 — PrintNightmare
+  ✗ CVE-2021-34527 - PrintNightmare
     Qué pasó:    Investigadores de Sangfor publicaron PoC pensando que
                  ya estaba parcheada. NO LO ESTABA. Caos. Microsoft tuvo
                  que sacar parche de emergencia.
     Lección:     Verifica DOS VECES que el fix está publicado antes de
                  hacer disclosure técnico.
 
-  ✗ CVE-2022-30190 — Follina
+  ✗ CVE-2022-30190 - Follina
     Qué pasó:    Reportada vía VirusTotal en abril 2022. Microsoft tardó
                  SEMANAS en reaccionar. Investigador acabó publicando.
     Lección:     A veces la coordinación falla. ¿Qué haces si el vendor
@@ -445,10 +445,10 @@ LISTA OFICIAL DE CNAs
 
 
 ================================================================================
-  7. CISA KEV — VULNERABILIDADES EXPLOTADAS ACTIVAMENTE
+  7. CISA KEV - VULNERABILIDADES EXPLOTADAS ACTIVAMENTE
 ================================================================================
 
-KEV — Known Exploited Vulnerabilities Catalog
+KEV - Known Exploited Vulnerabilities Catalog
   Lista mantenida por CISA con vulns que SE ESTÁN EXPLOTANDO ahora mismo
   en ataques reales en el mundo. Actualización semanal.
 
@@ -470,7 +470,7 @@ KEV — Known Exploited Vulnerabilities Catalog
 
 
 ================================================================================
-  8. VENDOR ADVISORIES — PORTALES OFICIALES DE LOS GRANDES
+  8. VENDOR ADVISORIES - PORTALES OFICIALES DE LOS GRANDES
 ================================================================================
 
   • Microsoft Security Response Center (MSRC)
@@ -519,13 +519,13 @@ KEV — Known Exploited Vulnerabilities Catalog
 ================================================================================
 
 ESTÁNDARES INTERNACIONALES
-  • ISO/IEC 29147 — Vulnerability Disclosure
+  • ISO/IEC 29147 - Vulnerability Disclosure
     https://www.iso.org/standard/72311.html
 
-  • ISO/IEC 30111 — Vulnerability Handling Processes
+  • ISO/IEC 30111 - Vulnerability Handling Processes
     https://www.iso.org/standard/69725.html
 
-  • RFC 9116 — A File Format to Aid in Security Vulnerability Disclosure
+  • RFC 9116 - A File Format to Aid in Security Vulnerability Disclosure
     https://www.rfc-editor.org/rfc/rfc9116
 
 GUÍAS DE REFERENCIA
@@ -554,22 +554,22 @@ NORMATIVA EU
 DEMO GUIADA "DEL CVE A LA EXPLOTACIÓN"
   Recorrer en directo el ciclo completo con los alumnos:
 
-  PASO 1 — Coger un CVE reciente del catálogo CISA KEV
+  PASO 1 - Coger un CVE reciente del catálogo CISA KEV
            https://www.cisa.gov/known-exploited-vulnerabilities-catalog
 
-  PASO 2 — Buscarlo en NVD para ver el CVSS, vector y referencias
+  PASO 2 - Buscarlo en NVD para ver el CVSS, vector y referencias
            https://nvd.nist.gov
 
-  PASO 3 — Hacer click en la referencia del vendor para ver el advisory
+  PASO 3 - Hacer click en la referencia del vendor para ver el advisory
            original (lo que publicó el fabricante)
 
-  PASO 4 — Buscarlo en HackerOne Hacktivity por si hay reporte público
+  PASO 4 - Buscarlo en HackerOne Hacktivity por si hay reporte público
            https://hackerone.com/hacktivity
 
-  PASO 5 — Buscarlo en ExploitDB por si hay PoC
+  PASO 5 - Buscarlo en ExploitDB por si hay PoC
            https://www.exploit-db.com
 
-  PASO 6 — Buscar al investigador en Twitter/X o Mastodon para ver
+  PASO 6 - Buscar al investigador en Twitter/X o Mastodon para ver
            el "human side" del disclosure
 
   RESULTADO: los alumnos ven en 20 minutos el ciclo entero
@@ -577,7 +577,7 @@ DEMO GUIADA "DEL CVE A LA EXPLOTACIÓN"
              explotación pública.
 
 
-EJERCICIO COMPLEMENTARIO — RELLENAR EL FORMULARIO MITRE
+EJERCICIO COMPLEMENTARIO - RELLENAR EL FORMULARIO MITRE
   Abrir https://cveform.mitre.org y rellenar (sin enviar) un caso ficticio.
   Comentar cada campo en directo. Útil para que vean qué información
   exacta hace falta cuando descubran algo de verdad.
@@ -585,7 +585,7 @@ EJERCICIO COMPLEMENTARIO — RELLENAR EL FORMULARIO MITRE
 
 
 ================================================================================
- EXTRA — RECURSOS PARA SEGUIR APRENDIENDO
+ EXTRA - RECURSOS PARA SEGUIR APRENDIENDO
 ================================================================================
 
 NEWSLETTERS Y FEEDS

@@ -1,7 +1,7 @@
 ================================================================================
-  MÓDULO M2 — EXPLOTACIÓN DE CVEs
+  MÓDULO M2 - EXPLOTACIÓN DE CVEs
   Máquinas DockerLabs basadas en CVEs reales
-  BigSchool — Escuela de Ciberseguridad
+  BigSchool - Escuela de Ciberseguridad
 ================================================================================
 
 AUDITORÍA REALIZADA SOBRE:
@@ -64,7 +64,7 @@ DIDÁCTICO PARA: Mostrar qué es un supply-chain attack y por qué auditar
 ================================================================================
 DIFICULTAD     : Fácil
 CVE            : CVE-2015-6033
-PRODUCTO       : Nibbleblog 4.0.3 — plugin "My Image"
+PRODUCTO       : Nibbleblog 4.0.3 - plugin "My Image"
 TIPO           : Arbitrary File Upload → RCE (autenticado)
 RESUMEN        : Tras login con creds débiles (admin:admin), el plugin
                  "My Image" permite subir archivos sin validación de
@@ -87,7 +87,7 @@ DIDÁCTICO PARA: Mostrar cómo un CVE "post-auth" sigue siendo crítico si
   3. HiddenCat
 ================================================================================
 DIFICULTAD     : Media
-CVE            : CVE-2020-1938 — "Ghostcat"
+CVE            : CVE-2020-1938 - "Ghostcat"
 PRODUCTO       : Apache Tomcat 9.0.30 (puerto AJP 8009)
 TIPO           : Local File Inclusion vía AJP / RCE bajo ciertas condiciones
 RESUMEN        : El protocolo AJP permite leer cualquier archivo de la
@@ -115,7 +115,7 @@ DIDÁCTICO PARA: Enseñar qué es AJP, por qué hay que cerrar puertos
 ================================================================================
 DIFICULTAD     : Media
 CVE            : CVE-2019-0193
-PRODUCTO       : Apache Solr — puerto 8983
+PRODUCTO       : Apache Solr - puerto 8983
 TIPO           : Remote Code Execution vía DataImportHandler
 RESUMEN        : El módulo DataImportHandler permite ejecutar código
                  arbitrario JS via configuraciones manipuladas. Solo si
@@ -181,7 +181,7 @@ REFERENCIAS OFICIALES:
   CVE.org      : https://www.cve.org/CVERecord?id=CVE-2023-46604
   Apache       : https://activemq.apache.org/security-advisories.data/CVE-2023-46604-announcement.txt
   CISA KEV     : https://www.cisa.gov/known-exploited-vulnerabilities-catalog
-                 (incluida en KEV — explotada activamente)
+                 (incluida en KEV - explotada activamente)
 
 CVSS           : 10.0 Critical
 DIDÁCTICO PARA: Vuln crítico MODERNO. Ejemplo de cómo un CVE pasa de
@@ -269,7 +269,7 @@ DIDÁCTICO PARA: Mostrar el problema de plugins abandonados. Aún hoy hay
 
 
 ================================================================================
-  RESUMEN VISUAL — TABLA COMPLETA
+  RESUMEN VISUAL - TABLA COMPLETA
 ================================================================================
 
 #   MÁQUINA          DIF.   CVE              SERVICIO                    CVSS
@@ -342,30 +342,30 @@ DIDÁCTICO PARA: Mostrar el problema de plugins abandonados. Aún hoy hay
 
 
 ────────────────────────────────────────────────────────────────────────────────
-  PROPUESTA DIDÁCTICA — RECORRIDO PEDAGÓGICO 4H
+  PROPUESTA DIDÁCTICA - RECORRIDO PEDAGÓGICO 4H
 ────────────────────────────────────────────────────────────────────────────────
 
-  HORA 1 — TEORÍA + DEMO METODOLOGÍA (60 min)
+  HORA 1 - TEORÍA + DEMO METODOLOGÍA (60 min)
     • Qué es un CVE (10 min)
-    • CVSS — calculadora (10 min)
+    • CVSS - calculadora (10 min)
     • CNAs / vendor / INCIBE / MITRE (10 min)
     • Cómo se reporta (10 min)
     • Demo metodología nmap → searchsploit → nuclei (20 min)
 
-  HORA 2 — CVEs CLÁSICOS (60 min)
-    • FirstHacking          (vsftpd backdoor — CVE-2011-2523)   20 min
-    • ChocolateLovers       (Nibbleblog — CVE-2015-6033)        20 min
-    • Asucar                (WP Site Editor — CVE-2018-7475)    20 min
+  HORA 2 - CVEs CLÁSICOS (60 min)
+    • FirstHacking          (vsftpd backdoor - CVE-2011-2523)   20 min
+    • ChocolateLovers       (Nibbleblog - CVE-2015-6033)        20 min
+    • Asucar                (WP Site Editor - CVE-2018-7475)    20 min
 
-  HORA 3 — CVEs MODERNOS DE SERVICIOS (60 min)
-    • HiddenCat             (Tomcat Ghostcat — CVE-2020-1938)   20 min
-    • Eclipse               (Apache Solr — CVE-2019-0193)       20 min
-    • Move                  (Grafana — CVE-2021-43798)          20 min
+  HORA 3 - CVEs MODERNOS DE SERVICIOS (60 min)
+    • HiddenCat             (Tomcat Ghostcat - CVE-2020-1938)   20 min
+    • Eclipse               (Apache Solr - CVE-2019-0193)       20 min
+    • Move                  (Grafana - CVE-2021-43798)          20 min
 
-  HORA 4 — CVEs CRÍTICOS RECIENTES + REPORTE (60 min)
-    • Fooding               (ActiveMQ — CVE-2023-46604)         15 min
-    • Secretjenkins         (Jenkins CLI — CVE-2024-23897)      15 min
-    • SummerVibes           (CMS Made Simple — CVE-2024-27622)  10 min
+  HORA 4 - CVEs CRÍTICOS RECIENTES + REPORTE (60 min)
+    • Fooding               (ActiveMQ - CVE-2023-46604)         15 min
+    • Secretjenkins         (Jenkins CLI - CVE-2024-23897)      15 min
+    • SummerVibes           (CMS Made Simple - CVE-2024-27622)  10 min
     • Cómo se reporta un CVE oficialmente (vía INCIBE/MITRE)    20 min
 
 

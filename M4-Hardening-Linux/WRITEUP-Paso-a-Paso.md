@@ -1,4 +1,4 @@
-# M4 — HARDENING LINUX — WRITEUP PRÁCTICO
+# M4 - HARDENING LINUX - WRITEUP PRÁCTICO
 
 **Sistema objetivo:** Ubuntu Server 22.04 LTS limpia (VM con snapshot)
 **Duración total práctica:** ~3h 45min
@@ -26,28 +26,28 @@
 
 ---
 
-# PRE — PREPARACIÓN (15 min)
+# PRE - PREPARACIÓN (15 min)
 
-### P.1 — Snapshot inicial
+### P.1 - Snapshot inicial
 ```bash
 # En VirtualBox/Vagrant: tomar snapshot "baseline-clean"
 ```
 **Por qué:** vamos a romper cosas. El snapshot es la red de seguridad.
 
-### P.2 — Actualizar sistema
+### P.2 - Actualizar sistema
 ```bash
 sudo apt update && sudo apt upgrade -y
 ```
 **Por qué:** partimos de un sistema con parches al día (separamos hardening de patching).
 
-### P.3 — Crear usuario admin con sudo
+### P.3 - Crear usuario admin con sudo
 ```bash
 sudo adduser admin
 sudo usermod -aG sudo admin
 ```
 **Por qué:** todo el módulo se hace con `admin`, nunca con root directo.
 
-### P.4 — Instalar herramientas base
+### P.4 - Instalar herramientas base
 ```bash
 sudo apt install -y lynis git curl wget vim acl
 ```
@@ -57,22 +57,22 @@ sudo apt install -y lynis git curl wget vim acl
 
 ---
 
-# M0 — BASELINE LYNIS (15 min)
+# M0 - BASELINE LYNIS (15 min)
 
-### 0.1 — Primera auditoría
+### 0.1 - Primera auditoría
 ```bash
 sudo lynis audit system
 ```
 **Por qué:** medir el sistema "tal cual" antes de tocar nada.
 
-### 0.2 — Guardar el HI baseline
+### 0.2 - Guardar el HI baseline
 ```bash
 grep "Hardening index" /var/log/lynis.log | tee ~/HI-baseline.txt
 sudo cp /var/log/lynis-report.dat ~/lynis-baseline.dat
 ```
 **Por qué:** lo compararemos al final del módulo.
 
-### 0.3 — Ver warnings y suggestions
+### 0.3 - Ver warnings y suggestions
 ```bash
 sudo lynis show warnings
 sudo lynis show suggestions | head -50
@@ -85,21 +85,21 @@ sudo lynis show suggestions | head -50
 
 ---
 
-# M1 — IDENTIDAD: PAM + SUDO + SSH (30 min)
+# M1 - IDENTIDAD: PAM + SUDO + SSH (30 min)
 
-### 1.1 — Auditar cuentas sistema con shell válido
+### 1.1 - Auditar cuentas sistema con shell válido
 ```bash
 awk -F: '($3<1000)&&($7!~/nologin|false/){print $1,$7}' /etc/passwd
 ```
 **Por qué:** cuentas de servicio no deben tener shell. Si tienen `/bin/bash` es vector de ataque.
 
-### 1.2 — Bloquear shells de cuentas sistema (si las hay)
+### 1.2 - Bloquear shells de cuentas sistema (si las hay)
 ```bash
 sudo usermod -s /usr/sbin/nologin <user>
 ```
 **Por qué:** elimina el vector de login en cuentas que no son humanas.
 
-### 1.3 — Política de contraseñas (pwquality)
+### 1.3 - Política de contraseñas (pwquality)
 ```bash
 sudo apt install -y libpam-pwquality
 sudo tee -a /etc/security/pwquality.conf <<'EOF'
@@ -115,7 +115,7 @@ EOF
 ```
 **Por qué:** fuerza contraseñas largas y complejas. Bloquea la reutilización de las últimas 5.
 
-### 1.4 — Lockout tras intentos fallidos (faillock)
+### 1.4 - Lockout tras intentos fallidos (faillock)
 ```bash
 sudo tee -a /etc/security/faillock.conf <<'EOF'
 deny = 5
@@ -125,7 +125,7 @@ EOF
 ```
 **Por qué:** 5 fallos → cuenta bloqueada 15 min. Mata brute-force local.
 
-### 1.5 — sudoers seguro
+### 1.5 - sudoers seguro
 ```bash
 sudo visudo
 ```
@@ -138,14 +138,14 @@ Defaults !visiblepw
 ```
 **Por qué:** `env_reset` evita inyección por variables. Logfile audita cada sudo.
 
-### 1.6 — Generar par de claves SSH (en tu máquina, no la VM)
+### 1.6 - Generar par de claves SSH (en tu máquina, no la VM)
 ```bash
 ssh-keygen -t ed25519 -C "admin@hardening-lab"
 ssh-copy-id -p 22 admin@<vm-ip>
 ```
 **Por qué:** SSH key-only requiere clave previa. Si la perdemos, nos quedamos fuera.
 
-### 1.7 — Hardening sshd_config
+### 1.7 - Hardening sshd_config
 ```bash
 sudo cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
 sudo tee /etc/ssh/sshd_config.d/99-hardening.conf <<'EOF'
@@ -167,7 +167,7 @@ EOF
 ```
 **Por qué:** puerto custom reduce ruido, sin password mata 99% de bots, MaxAuthTries 3 corta brute-force, AllowUsers limita a un usuario.
 
-### 1.8 — Banner de login
+### 1.8 - Banner de login
 ```bash
 sudo tee /etc/issue.net <<'EOF'
 **********************************************************
@@ -178,11 +178,11 @@ EOF
 ```
 **Por qué:** requisito legal en muchas auditorías (ANSSI, STIG). Disuasorio + cobertura legal.
 
-### 1.9 — Aplicar y test SSH
+### 1.9 - Aplicar y test SSH
 ```bash
 sudo sshd -t                          # validar config sin reiniciar
 sudo systemctl restart ssh
-# DESDE OTRA TERMINAL — NO CIERRES LA SESIÓN ACTUAL:
+# DESDE OTRA TERMINAL - NO CIERRES LA SESIÓN ACTUAL:
 ssh -p 2222 admin@<vm-ip>
 ```
 **Por qué:** si rompes SSH y cierras la única sesión, te quedas fuera. Mantén una abierta hasta confirmar.
@@ -196,9 +196,9 @@ grep "Hardening index" /var/log/lynis.log | tail -1
 
 ---
 
-# M2 — PERMISOS: SUID + ACLs + CAPABILITIES (25 min)
+# M2 - PERMISOS: SUID + ACLs + CAPABILITIES (25 min)
 
-### 2.1 — Inventario de SUID/SGID
+### 2.1 - Inventario de SUID/SGID
 ```bash
 sudo find / -perm -4000 -type f 2>/dev/null | tee ~/suid-baseline.txt
 sudo find / -perm -2000 -type f 2>/dev/null | tee ~/sgid-baseline.txt
@@ -206,7 +206,7 @@ wc -l ~/suid-baseline.txt
 ```
 **Por qué:** baseline para detectar SUIDs nuevos sospechosos en el futuro.
 
-### 2.2 — Cruzar contra GTFOBins (revisión manual)
+### 2.2 - Cruzar contra GTFOBins (revisión manual)
 ```bash
 # Abrir https://gtfobins.github.io/ y buscar cada SUID inusual
 # Quitar SUID de los que NO sean estándar Linux:
@@ -214,14 +214,14 @@ sudo chmod u-s /usr/bin/<binario-no-necesario>
 ```
 **Por qué:** cada SUID en GTFOBins es una ruta directa a root. Solo mantén los necesarios (passwd, sudo, su, mount, ping...).
 
-### 2.3 — Sticky bit en /tmp y /var/tmp
+### 2.3 - Sticky bit en /tmp y /var/tmp
 ```bash
 ls -ld /tmp /var/tmp                  # debe tener "t" al final (drwxrwxrwt)
 sudo chmod +t /tmp /var/tmp           # solo si falta
 ```
 **Por qué:** sin sticky, cualquier user borra archivos de otros en /tmp.
 
-### 2.4 — umask seguro
+### 2.4 - umask seguro
 ```bash
 sudo sed -i 's/^UMASK.*/UMASK 027/' /etc/login.defs
 echo 'umask 027' | sudo tee -a /etc/profile
@@ -229,7 +229,7 @@ echo 'umask 027' | sudo tee -a /etc/bash.bashrc
 ```
 **Por qué:** archivos nuevos no son legibles por "others". `027` = `rwxr-x---`.
 
-### 2.5 — ACL: caso práctico
+### 2.5 - ACL: caso práctico
 ```bash
 sudo mkdir -p /opt/proyecto
 sudo chown root:root /opt/proyecto
@@ -240,7 +240,7 @@ getfacl /opt/proyecto
 ```
 **Por qué:** ACL permite permisos finos sin abrir a "others". Evita el `chmod 777` chapuza.
 
-### 2.6 — Capability en lugar de SUID (demo)
+### 2.6 - Capability en lugar de SUID (demo)
 ```bash
 # Imagina app que necesita bind a puerto <1024 sin ser root:
 sudo cp /usr/bin/python3 /usr/local/bin/myapp
@@ -250,7 +250,7 @@ sudo rm /usr/local/bin/myapp           # demo, limpiar
 ```
 **Por qué:** capability concede UN privilegio puntual. SUID concede TODO root. Mucho más seguro.
 
-### 2.7 — Detectar archivos huérfanos y world-writable
+### 2.7 - Detectar archivos huérfanos y world-writable
 ```bash
 sudo find / -nouser -o -nogroup 2>/dev/null
 sudo find / -perm -0002 -type f -not -path "/proc/*" 2>/dev/null
@@ -265,9 +265,9 @@ sudo lynis audit system --quick --tests-from-group file_permissions
 
 ---
 
-# M3 — KERNEL: SYSCTL + MÓDULOS + GRUB (30 min)
+# M3 - KERNEL: SYSCTL + MÓDULOS + GRUB (30 min)
 
-### 3.1 — Crear fichero único de hardening sysctl
+### 3.1 - Crear fichero único de hardening sysctl
 ```bash
 sudo tee /etc/sysctl.d/99-hardening.conf <<'EOF'
 # === KERNEL ===
@@ -304,7 +304,7 @@ sudo sysctl -p /etc/sysctl.d/99-hardening.conf
 - **FILESYSTEM:** evita race conditions con symlinks/hardlinks. Sin core dumps SUID.
 - **NETWORK:** SYN cookies contra DDoS, rp_filter contra IP spoofing, no aceptar ICMP redirects.
 
-### 3.2 — Bloquear módulos de hardware no usado
+### 3.2 - Bloquear módulos de hardware no usado
 ```bash
 sudo tee /etc/modprobe.d/blacklist-hardening.conf <<'EOF'
 install usb-storage /bin/true
@@ -318,7 +318,7 @@ EOF
 ```
 **Por qué:** USB-storage = robo por pendrive. Firewire/BT = no se usan en server. dccp/sctp/rds/tipc = protocolos exóticos con CVEs históricos.
 
-### 3.3 — GRUB password
+### 3.3 - GRUB password
 ```bash
 sudo grub-mkpasswd-pbkdf2
 # Copia el hash que sale (grub.pbkdf2.sha512.10000.XXXX...)
@@ -330,7 +330,7 @@ sudo update-grub
 ```
 **Por qué:** sin password GRUB, atacante con acceso físico → init=/bin/bash → root sin clave.
 
-### 3.4 — Verificar
+### 3.4 - Verificar
 ```bash
 sysctl kernel.randomize_va_space      # debe = 2
 sysctl net.ipv4.tcp_syncookies        # debe = 1
@@ -345,16 +345,16 @@ sudo lynis audit system --quick --tests-from-group kernel
 
 ---
 
-# M4 — FIREWALL + FAIL2BAN (30 min)
+# M4 - FIREWALL + FAIL2BAN (30 min)
 
-### 4.1 — UFW: política base
+### 4.1 - UFW: política base
 ```bash
 sudo ufw default deny incoming
 sudo ufw default allow outgoing
 ```
 **Por qué:** denegar todo entrante por defecto. Solo abrir lo estrictamente necesario.
 
-### 4.2 — Permitir solo SSH custom + HTTP/HTTPS
+### 4.2 - Permitir solo SSH custom + HTTP/HTTPS
 ```bash
 sudo ufw allow 2222/tcp comment 'SSH custom'
 sudo ufw allow 80/tcp
@@ -365,7 +365,7 @@ sudo ufw status verbose
 ```
 **Por qué:** mínima superficie expuesta. Logging para detectar intentos.
 
-### 4.3 — Fail2ban
+### 4.3 - Fail2ban
 ```bash
 sudo apt install -y fail2ban
 sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
@@ -385,7 +385,7 @@ sudo fail2ban-client status sshd
 ```
 **Por qué:** bloquea IPs que fallan 3 intentos en 10 min, ban 1h. Reduce ruido y mata bots.
 
-### 4.4 — Test ban manual
+### 4.4 - Test ban manual
 ```bash
 sudo fail2ban-client set sshd banip 192.0.2.99
 sudo fail2ban-client status sshd          # ver IP en banned
@@ -393,7 +393,7 @@ sudo fail2ban-client set sshd unbanip 192.0.2.99
 ```
 **Por qué:** valida que el jail funciona antes de exponer el server.
 
-### 4.5 — Test brute-force real (desde Kali, opcional)
+### 4.5 - Test brute-force real (desde Kali, opcional)
 ```bash
 # DESDE OTRA VM (Kali):
 hydra -l admin -P /usr/share/wordlists/rockyou.txt ssh://<vm-ip>:2222 -t 4
@@ -410,22 +410,22 @@ sudo lynis audit system --quick --tests-from-group firewalls
 
 ---
 
-# M5 — SERVICIOS + FSTAB + AIDE (30 min)
+# M5 - SERVICIOS + FSTAB + AIDE (30 min)
 
-### 5.1 — Inventario de servicios habilitados
+### 5.1 - Inventario de servicios habilitados
 ```bash
 systemctl list-unit-files --state=enabled | grep -v static
 ```
 **Por qué:** cada servicio = superficie de ataque. Hay que justificar cada uno.
 
-### 5.2 — Deshabilitar lo innecesario
+### 5.2 - Deshabilitar lo innecesario
 ```bash
 sudo systemctl disable --now avahi-daemon cups bluetooth ModemManager 2>/dev/null
 sudo systemctl mask avahi-daemon cups
 ```
 **Por qué:** avahi/cups/bluetooth no aplican a server. Mask impide reactivación accidental.
 
-### 5.3 — Hardening de un servicio (ej: SSH)
+### 5.3 - Hardening de un servicio (ej: SSH)
 ```bash
 sudo mkdir -p /etc/systemd/system/ssh.service.d
 sudo tee /etc/systemd/system/ssh.service.d/hardening.conf <<'EOF'
@@ -450,7 +450,7 @@ systemd-analyze security ssh
 ```
 **Por qué:** sandboxing del servicio. Si SSH es comprometido, no puede tocar el resto del sistema.
 
-### 5.4 — fstab: noexec/nosuid/nodev en /tmp
+### 5.4 - fstab: noexec/nosuid/nodev en /tmp
 ```bash
 sudo cp /etc/fstab /etc/fstab.bak
 sudo tee -a /etc/fstab <<'EOF'
@@ -461,7 +461,7 @@ mount | grep /tmp
 ```
 **Por qué:** payloads de exploits suelen caer en /tmp y ejecutarse. `noexec` bloquea ejecutar. `nosuid` ignora SUID. `nodev` no permite dispositivos.
 
-### 5.5 — Deshabilitar core dumps
+### 5.5 - Deshabilitar core dumps
 ```bash
 echo '* hard core 0' | sudo tee -a /etc/security/limits.conf
 echo 'fs.suid_dumpable = 0' | sudo tee -a /etc/sysctl.d/99-hardening.conf
@@ -469,7 +469,7 @@ sudo sysctl -p /etc/sysctl.d/99-hardening.conf
 ```
 **Por qué:** core dumps pueden contener secretos en memoria (passwords, claves).
 
-### 5.6 — AIDE: baseline de integridad
+### 5.6 - AIDE: baseline de integridad
 ```bash
 sudo apt install -y aide aide-common
 sudo aideinit                           # tarda 5-10 min
@@ -478,7 +478,7 @@ sudo aide --check                       # debe decir "AIDE found NO differences"
 ```
 **Por qué:** baseline criptográfico de cada archivo del sistema. Detecta cualquier modificación posterior.
 
-### 5.7 — Cron diario AIDE
+### 5.7 - Cron diario AIDE
 ```bash
 echo '0 5 * * * root /usr/bin/aide --check | mail -s "AIDE Report $(hostname)" admin@local' | sudo tee /etc/cron.d/aide
 ```
@@ -492,9 +492,9 @@ sudo lynis audit system --quick
 
 ---
 
-# M6 — AUDITD + RKHUNTER + JOURNALD (30 min)
+# M6 - AUDITD + RKHUNTER + JOURNALD (30 min)
 
-### 6.1 — journald persistente
+### 6.1 - journald persistente
 ```bash
 sudo mkdir -p /var/log/journal
 sudo systemd-tmpfiles --create --prefix /var/log/journal
@@ -504,14 +504,14 @@ journalctl --disk-usage
 ```
 **Por qué:** por defecto journald borra logs al reboot. Persistent = los conserva.
 
-### 6.2 — Instalar auditd
+### 6.2 - Instalar auditd
 ```bash
 sudo apt install -y auditd audispd-plugins
 sudo systemctl enable --now auditd
 ```
 **Por qué:** auditd registra a nivel kernel quién hizo qué (acceso a archivos, ejecuciones).
 
-### 6.3 — Reglas auditd profesionales (PCI-DSS / CIS)
+### 6.3 - Reglas auditd profesionales (PCI-DSS / CIS)
 ```bash
 sudo tee /etc/audit/rules.d/hardening.rules <<'EOF'
 ## Borrar reglas previas
@@ -550,7 +550,7 @@ sudo auditctl -l
 ```
 **Por qué:** trazabilidad forense. Si te atacan, sabes qué tocaron. `-e 2` = nadie puede borrar reglas en runtime.
 
-### 6.4 — Test queries auditd
+### 6.4 - Test queries auditd
 ```bash
 sudo touch /etc/passwd                  # generar evento
 sudo ausearch -k passwd_changes --start recent
@@ -559,7 +559,7 @@ sudo aureport -au                       # autenticaciones fallidas
 ```
 **Por qué:** confirma que auditd está capturando + ver formato de queries.
 
-### 6.5 — rkhunter: rootkit detection
+### 6.5 - rkhunter: rootkit detection
 ```bash
 sudo apt install -y rkhunter
 sudo rkhunter --propupd                 # baseline tras instalación limpia
@@ -567,14 +567,14 @@ sudo rkhunter --check --skip-keypress
 ```
 **Por qué:** detecta backdoors, archivos modificados, puertos sospechosos. Baseline antes para no falsos positivos.
 
-### 6.6 — chkrootkit (segunda opinión)
+### 6.6 - chkrootkit (segunda opinión)
 ```bash
 sudo apt install -y chkrootkit
 sudo chkrootkit | grep -v "not infected" | grep -v "not found"
 ```
 **Por qué:** complementa rkhunter con técnicas distintas.
 
-### 6.7 — Logwatch para resumen diario
+### 6.7 - Logwatch para resumen diario
 ```bash
 sudo apt install -y logwatch
 sudo logwatch --detail high --range today --output stdout | head -50
@@ -589,16 +589,16 @@ sudo lynis audit system --quick --tests-from-group logging
 
 ---
 
-# M7 — AUDITORÍA FINAL + REPORTE (30 min)
+# M7 - AUDITORÍA FINAL + REPORTE (30 min)
 
-### 7.1 — Lynis audit completo final
+### 7.1 - Lynis audit completo final
 ```bash
 sudo lynis audit system --report-file ~/lynis-final.dat
 grep "Hardening index" /var/log/lynis.log | tail -1 | tee ~/HI-final.txt
 ```
 **Por qué:** medición final del proceso completo.
 
-### 7.2 — Comparar baseline vs final
+### 7.2 - Comparar baseline vs final
 ```bash
 echo "=== BASELINE ===" && cat ~/HI-baseline.txt
 echo "=== FINAL ===" && cat ~/HI-final.txt
@@ -606,7 +606,7 @@ diff ~/lynis-baseline.dat ~/lynis-final.dat | head -50
 ```
 **Por qué:** demostrar el progreso con números, no opiniones.
 
-### 7.3 — OpenSCAP: perfil CIS
+### 7.3 - OpenSCAP: perfil CIS
 ```bash
 sudo apt install -y libopenscap8 ssg-debderived
 ls /usr/share/xml/scap/ssg/content/
@@ -617,7 +617,7 @@ oscap info $PROFILE_FILE | grep -A1 "Profile"
 ```
 **Por qué:** OpenSCAP es el estándar oficial CIS/STIG. Genera reporte profesional.
 
-### 7.4 — Ejecutar perfil CIS L1 Server
+### 7.4 - Ejecutar perfil CIS L1 Server
 ```bash
 sudo oscap xccdf eval \
   --profile xccdf_org.ssgproject.content_profile_cis_level1_server \
@@ -630,7 +630,7 @@ firefox /tmp/oscap-report.html &
 ```
 **Por qué:** evaluación contra CIS Benchmark formal. El HTML es entregable.
 
-### 7.5 — Generar script de remediación (NO aplicar sin revisar)
+### 7.5 - Generar script de remediación (NO aplicar sin revisar)
 ```bash
 sudo oscap xccdf generate fix \
   --profile xccdf_org.ssgproject.content_profile_cis_level1_server \
@@ -639,13 +639,13 @@ less /tmp/remediation.sh
 ```
 **Por qué:** script automático de los checks que aún fallan. Útil pero PELIGROSO si se ejecuta a ciegas.
 
-### 7.6 — Plantilla de informe
+### 7.6 - Plantilla de informe
 ```bash
 mkdir -p ~/informe-hardening
 cd ~/informe-hardening
 
 tee informe.md <<'EOF'
-# Informe de Hardening — <hostname>
+# Informe de Hardening - <hostname>
 
 ## 1. Resumen ejecutivo
 - Sistema: Ubuntu Server 22.04 LTS
@@ -689,7 +689,7 @@ ls -la ~/informe-hardening/
 ```
 **Por qué:** entregable profesional. Lo que distingue a un junior de un consultor senior.
 
-### 7.7 — Configurar mantenimiento automático
+### 7.7 - Configurar mantenimiento automático
 ```bash
 # unattended-upgrades:
 sudo apt install -y unattended-upgrades
@@ -714,7 +714,7 @@ echo "=========================================="
 
 ---
 
-# RESUMEN — TIMELINE COMPLETO
+# RESUMEN - TIMELINE COMPLETO
 
 | Bloque | Min | Acumulado | Acción clave | Verificación |
 |---|---|---|---|---|
@@ -739,7 +739,7 @@ echo "=========================================="
 3. **Lee TODO comando antes de pegarlo.** Especialmente los `tee` y `sed -i`.
 4. **`sshd -t` ANTES de reiniciar SSH.** Valida la config sin tirarte fuera.
 5. **No apliques `oscap remediation.sh` a ciegas.** Léelo primero, puede romper servicios.
-6. **HI no es perfecto.** Un HI 100 es imposible — siempre hay trade-offs entre seguridad y funcionalidad.
+6. **HI no es perfecto.** Un HI 100 es imposible - siempre hay trade-offs entre seguridad y funcionalidad.
 
 ---
 

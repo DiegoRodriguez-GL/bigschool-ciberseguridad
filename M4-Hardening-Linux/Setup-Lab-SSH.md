@@ -1,4 +1,4 @@
-# Setup del laboratorio — Conexiones SSH
+# Setup del laboratorio - Conexiones SSH
 
 > Cómo conectar al servidor Ubuntu durante el módulo de Hardening Linux cuando el host es Windows.
 
@@ -48,7 +48,7 @@ ssh -p 2222 admin@192.168.56.10
 
 ## Cuándo SÍ levantar Kali
 
-**Solo para V4.5 — demo de Fail2ban con brute-force real.**
+**Solo para V4.5 - demo de Fail2ban con brute-force real.**
 
 ```bash
 # Desde Kali:

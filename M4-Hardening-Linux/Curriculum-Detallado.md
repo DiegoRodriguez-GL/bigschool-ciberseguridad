@@ -1,14 +1,14 @@
 ================================================================================
-  MÓDULO M4 — HARDENING LINUX
-  Curriculum detallado — 8 vídeos / ~4h
-  BigSchool — Escuela de Ciberseguridad
+  MÓDULO M4 - HARDENING LINUX
+  Curriculum detallado - 8 vídeos / ~4h
+  BigSchool - Escuela de Ciberseguridad
 ================================================================================
 
 FILOSOFÍA DEL MÓDULO
 ────────────────────────────────────────────────────────────────────────────────
-   1. Medir antes (V4.1 — Lynis baseline)
+   1. Medir antes (V4.1 - Lynis baseline)
    2. Endurecer 6 capas (V4.2 a V4.7)
-   3. Medir después (V4.8 — Lynis + OpenSCAP)
+   3. Medir después (V4.8 - Lynis + OpenSCAP)
    4. Documentar el progreso en un informe profesional
 
    Objetivo cuantificable: subir Lynis Hardening Index de ~55 a ~85+
@@ -40,14 +40,14 @@ ESQUEMA DEL ROADMAP
 
 
 ================================================================================
-  V4.1 — METODOLOGÍA HARDENING + CIS BENCHMARKS + LYNIS BASELINE (25 min)
+  V4.1 - METODOLOGÍA HARDENING + CIS BENCHMARKS + LYNIS BASELINE (25 min)
 ================================================================================
 
 CONCEPTOS CLAVE
   • Defense-in-depth (capas concéntricas de defensa)
   • Hardening != patching (cerrar superficie expuesta vs corregir bugs)
   • CIS Levels: L1 (server estable), L2 (entornos sensibles)
-  • Lynis Hardening Index (HI) — métrica numérica reproducible
+  • Lynis Hardening Index (HI) - métrica numérica reproducible
 
 ESTRUCTURA DEL VÍDEO
   1. Qué es hardening (3')
@@ -76,7 +76,7 @@ REFERENCIAS
 
 
 ================================================================================
-  V4.2 — USUARIOS, PAM, SUDO Y SSH HARDENING (30 min)
+  V4.2 - USUARIOS, PAM, SUDO Y SSH HARDENING (30 min)
 ================================================================================
 
 OBJETIVOS
@@ -134,7 +134,7 @@ REFERENCIAS
 
 
 ================================================================================
-  V4.3 — PERMISOS: SUID/SGID, STICKY, UMASK, ACLs, CAPABILITIES (30 min)
+  V4.3 - PERMISOS: SUID/SGID, STICKY, UMASK, ACLs, CAPABILITIES (30 min)
 ================================================================================
 
 OBJETIVOS
@@ -175,7 +175,7 @@ REFERENCIAS
 
 
 ================================================================================
-  V4.4 — KERNEL HARDENING: SYSCTL, MÓDULOS, GRUB, ASLR (30 min)
+  V4.4 - KERNEL HARDENING: SYSCTL, MÓDULOS, GRUB, ASLR (30 min)
 ================================================================================
 
 OBJETIVOS
@@ -236,7 +236,7 @@ REFERENCIAS
 
 
 ================================================================================
-  V4.5 — FIREWALL (nftables/ufw) + FAIL2BAN (30 min)
+  V4.5 - FIREWALL (nftables/ufw) + FAIL2BAN (30 min)
 ================================================================================
 
 OBJETIVOS
@@ -292,7 +292,7 @@ REFERENCIAS
 
 
 ================================================================================
-  V4.6 — SYSTEMD HARDENING + SERVICIOS + FSTAB + AIDE (30 min)
+  V4.6 - SYSTEMD HARDENING + SERVICIOS + FSTAB + AIDE (30 min)
 ================================================================================
 
 OBJETIVOS
@@ -325,7 +325,7 @@ SYSTEMD HARDENING FLAGS (cualquier service)
   systemd-analyze security
   systemd-analyze security <unit>
 
-/etc/fstab — opciones recomendadas
+/etc/fstab - opciones recomendadas
 
   # /tmp en RAM
   tmpfs   /tmp     tmpfs   defaults,nodev,nosuid,noexec,size=2G  0 0
@@ -351,7 +351,7 @@ REFERENCIAS
 
 
 ================================================================================
-  V4.7 — LOGGING Y AUDITORÍA: journald, auditd, rkhunter (30 min)
+  V4.7 - LOGGING Y AUDITORÍA: journald, auditd, rkhunter (30 min)
 ================================================================================
 
 OBJETIVOS
@@ -369,7 +369,7 @@ JOURNALD PERSISTENTE
   Compress=yes
   ForwardToSyslog=yes
 
-AUDITD — Reglas mínimas (/etc/audit/rules.d/hardening.rules)
+AUDITD - Reglas mínimas (/etc/audit/rules.d/hardening.rules)
 
   -D
   -b 8192
@@ -423,7 +423,7 @@ REFERENCIAS
 
 
 ================================================================================
-  V4.8 — AUDITORÍA FINAL: Lynis + OpenSCAP + REPORTE (35 min)
+  V4.8 - AUDITORÍA FINAL: Lynis + OpenSCAP + REPORTE (35 min)
 ================================================================================
 
 OBJETIVOS

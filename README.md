@@ -1,20 +1,20 @@
-# BigSchool — Módulos de Ciberseguridad
+# BigSchool - Módulos de Ciberseguridad
 
 Material didáctico para los módulos prácticos de ciberseguridad ofensiva y defensiva impartidos en BigSchool.
 
-> Cada módulo está diseñado como un curso de 3h 30min – 4h con roadmap, comandos exactos, writeup paso a paso y referencias oficiales.
+> Cada módulo está diseñado como un curso de 3h 30min - 4h con roadmap, comandos exactos, writeup paso a paso y referencias oficiales.
 
 ---
 
 ## 📚 Módulos disponibles
 
-### 🔓 M2 — Explotación de CVEs
+### 🔓 M2 - Explotación de CVEs
 
 Aprender a investigar, explotar y reportar vulnerabilidades **CVE reales** sobre máquinas vulnerables modernas (DockerLabs).
 
 | Documento | Contenido |
 |---|---|
-| [DockerLabs — Máquinas CVE](M2-Explotacion-CVEs/DockerLabs-Maquinas-CVE.md) | 9 máquinas con CVEs reales (2011–2024), CVSS, exploits y writeups |
+| [DockerLabs - Máquinas CVE](M2-Explotacion-CVEs/DockerLabs-Maquinas-CVE.md) | 9 máquinas con CVEs reales (2011-2024), CVSS, exploits y writeups |
 | [Recursos y Referencias](M2-Explotacion-CVEs/Recursos-y-Referencias.md) | Fuentes oficiales: NVD, MITRE, CISA KEV, INCIBE, HackerOne |
 
 **CVEs cubiertos:**
@@ -22,7 +22,7 @@ Aprender a investigar, explotar y reportar vulnerabilidades **CVE reales** sobre
 
 ---
 
-### 🛡️ M4 — Hardening Linux
+### 🛡️ M4 - Hardening Linux
 
 Endurecer un servidor Ubuntu 22.04 LTS desde cero hasta cumplir CIS Benchmark Level 1, con métricas medibles (Lynis Hardening Index).
 
@@ -53,7 +53,7 @@ Cada módulo sigue un formato consistente:
 |---|---|
 | **1. Marco teórico** | Diapositivas con conceptos, estándares y casos reales |
 | **2. Demo en vivo** | Comandos exactos sobre máquina real, paso a paso |
-| **3. Métricas medibles** | CVSS / Lynis HI / OpenSCAP score — no opiniones |
+| **3. Métricas medibles** | CVSS / Lynis HI / OpenSCAP score - no opiniones |
 | **4. Reporte profesional** | Plantilla de informe entregable al cliente |
 
 ---
